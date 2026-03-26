@@ -392,6 +392,68 @@
   .ac-macro-row-inline { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
   .ac-macro-row-inline .ac-inp { min-width: 0; width: 100%; }
 
+  /* ─── HISTORY PAGE ────────────────────────────────────── */
+  .hist-header { padding: 6px 0 14px; }
+  .hist-title { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+  .hist-subtitle { font-size: 13px; color: var(--muted); }
+
+  .hist-avg-strip { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .hist-avg-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 10px; text-align: center; }
+  .hist-avg-val { font-size: 18px; font-weight: 800; line-height: 1; margin-bottom: 3px; }
+  .hist-avg-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .hist-day-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--r);
+    padding: 14px 18px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.15s;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .hist-day-card:hover { border-color: var(--border2); }
+  .hist-day-card.today { border-color: rgba(74,144,217,0.4); background: rgba(74,144,217,0.05); }
+  .hist-day-left { flex: 1; min-width: 0; }
+  .hist-day-date { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .hist-day-date span { font-size: 12px; font-weight: 500; color: var(--muted); margin-left: 6px; }
+  .hist-day-macros { font-size: 12px; color: var(--muted2); }
+  .hist-day-right { text-align: right; flex-shrink: 0; }
+  .hist-day-kcal { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+  .hist-day-target { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .hist-day-bar { height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+  .hist-day-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+
+  .hist-empty { text-align: center; padding: 48px 20px; color: var(--muted); font-size: 14px; }
+  .hist-empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* Detail sheet */
+  .hist-detail-overlay {
+    position: fixed; inset: 0; z-index: 950;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  .hist-detail-sheet {
+    background: var(--card); border-radius: 20px 20px 0 0;
+    border: 1px solid var(--border2); border-bottom: none;
+    width: 100%; max-width: 700px; max-height: 88vh;
+    display: flex; flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.32,0.72,0,1);
+    padding: 10px 20px 0;
+  }
+  .hist-detail-sheet.visible { transform: translateY(0); }
+  .hist-detail-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .hist-detail-date { font-size: 18px; font-weight: 800; }
+  .hist-detail-body { flex: 1; overflow-y: auto; padding-bottom: 36px; }
+
+  .hd-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .hd-sum-card { background: var(--card2); border-radius: 12px; padding: 14px; }
+  .hd-sum-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .hd-sum-val { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .hd-sum-sub { font-size: 12px; color: var(--muted2); margin-top: 2px; }
+
+  .hd-meal-block { margin-bottom: 12px; }
+  .hd-meal-name { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .hd-food-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; background: var(--card2); border-radius: 10px; margin-bottom: 4px; }
+  .hd-food-name { font-size: 14px; font-weight: 500; }
+  .hd-food-right { font-size: 13px; color: var(--muted2); text-align: right; }
+
   /* ─── SCROLLBAR ───────────────────────────────────────── */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -699,10 +761,47 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════
+     PAGE — ИСТОРИЯ
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-history">
+  <div class="page-inner">
+    <div class="hist-header">
+      <div class="hist-title">История питания</div>
+      <div class="hist-subtitle" id="hist-subtitle">—</div>
+    </div>
+
+    <!-- Avg stats strip -->
+    <div class="hist-avg-strip" id="hist-avg-strip"></div>
+
+    <!-- Days list -->
+    <div id="hist-days-list"></div>
+
+    <!-- Day detail sheet -->
+    <div class="hist-detail-overlay" id="hist-detail-overlay" onclick="closeHistDetail(event)" style="display:none">
+      <div class="hist-detail-sheet" id="hist-detail-sheet">
+        <div class="qa-sheet-handle"></div>
+        <div class="hist-detail-header">
+          <div class="hist-detail-date" id="hd-date">—</div>
+          <button class="qa-sheet-close" onclick="closeHistDetailBtn()">✕</button>
+        </div>
+        <!-- summary -->
+        <div class="hd-summary" id="hd-summary"></div>
+        <!-- meals breakdown -->
+        <div id="hd-meals"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="nav-btn active" id="nav-home" onclick="goPage('home')">
     <span class="nav-icon">🏠</span>Сегодня
+  </button>
+  <button class="nav-btn" id="nav-history" onclick="goPage('history')">
+    <span class="nav-icon">📅</span>История
   </button>
   <button class="nav-btn" id="nav-params" onclick="goPage('params')">
     <span class="nav-icon">⚙️</span>Параметры
@@ -716,6 +815,7 @@ function goPage(id) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   document.getElementById('nav-' + id).classList.add('active');
+  if (id === 'history') renderHistory();
 }
 
 function openQuickAdd() {
@@ -1509,6 +1609,191 @@ function render() {
   renderProgress();
   renderMeals();
   renderWater();
+}
+
+// ─── HISTORY ─────────────────────────────────────────────────────
+function getAllDayKeys() {
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('nt_day_')) keys.push(k);
+  }
+  return keys.sort().reverse(); // newest first
+}
+
+function getDayTotals(dayState) {
+  let k=0,p=0,f=0,c=0;
+  (dayState.meals||[]).forEach(m=>(m.items||[]).forEach(it=>{
+    const r=it.grams/100;
+    k+=it.kcal*r; p+=it.p*r; f+=it.f*r; c+=it.c*r;
+  }));
+  return {k:Math.round(k),p:Math.round(p),f:Math.round(f),c:Math.round(c)};
+}
+
+function formatDayLabel(dateStr) {
+  const today = todayKey();
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+  const yKey = yesterday.toISOString().slice(0,10);
+  if (dateStr === today) return ['Сегодня', ''];
+  if (dateStr === yKey)  return ['Вчера', ''];
+  const [y,m,d] = dateStr.split('-');
+  const months = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  return [d + ' ' + months[parseInt(m)-1], y !== new Date().getFullYear().toString() ? y : ''];
+}
+
+function renderHistory() {
+  const keys = getAllDayKeys();
+  const today = todayKey();
+  const list = document.getElementById('hist-days-list');
+  const avgStrip = document.getElementById('hist-avg-strip');
+  const subtitle = document.getElementById('hist-subtitle');
+
+  if (keys.length === 0) {
+    avgStrip.innerHTML = '';
+    list.innerHTML = `<div class="hist-empty"><div class="hist-empty-icon">📭</div>Пока нет данных.<br>Начни записывать питание сегодня!</div>`;
+    subtitle.textContent = 'Нет записей';
+    return;
+  }
+
+  // Compute averages (skip today if empty)
+  let sumK=0,sumP=0,sumF=0,sumC=0,cnt=0;
+  keys.forEach(k => {
+    try {
+      const d = JSON.parse(localStorage.getItem(k));
+      const t = getDayTotals(d);
+      if (t.k > 0) { sumK+=t.k; sumP+=t.p; sumF+=t.f; sumC+=t.c; cnt++; }
+    } catch(e){}
+  });
+  const daysWithData = cnt || 1;
+  subtitle.textContent = `${keys.length} ${keys.length===1?'день':keys.length<5?'дня':'дней'} · среднее за дни с едой`;
+
+  avgStrip.innerHTML = `
+    <div class="hist-avg-item">
+      <div class="hist-avg-val">${Math.round(sumK/daysWithData)}</div>
+      <div class="hist-avg-label">ккал</div>
+    </div>
+    <div class="hist-avg-item">
+      <div class="hist-avg-val" style="color:var(--p)">${Math.round(sumP/daysWithData)}г</div>
+      <div class="hist-avg-label">белок</div>
+    </div>
+    <div class="hist-avg-item">
+      <div class="hist-avg-val" style="color:var(--f)">${Math.round(sumF/daysWithData)}г</div>
+      <div class="hist-avg-label">жиры</div>
+    </div>
+    <div class="hist-avg-item">
+      <div class="hist-avg-val" style="color:var(--c)">${Math.round(sumC/daysWithData)}г</div>
+      <div class="hist-avg-label">углев.</div>
+    </div>`;
+
+  list.innerHTML = '';
+  keys.forEach(key => {
+    const dateStr = key.replace('nt_day_','');
+    let dayState;
+    try { dayState = JSON.parse(localStorage.getItem(key)); } catch(e){ return; }
+    const t = getDayTotals(dayState);
+    const [label, year] = formatDayLabel(dateStr);
+    const isToday = dateStr === today;
+    const target = TARGETS.kcal || 0;
+    const pct = target ? Math.min(t.k/target*100,100) : 0;
+    const barColor = pct >= 95 ? 'var(--c)' : pct >= 70 ? 'var(--p)' : 'var(--muted)';
+
+    const card = document.createElement('div');
+    card.className = 'hist-day-card' + (isToday?' today':'');
+    card.innerHTML = `
+      <div class="hist-day-left">
+        <div class="hist-day-date">${label}<span>${year}</span>${isToday?'<span style="color:var(--p);margin-left:6px;font-size:11px">● сегодня</span>':''}</div>
+        <div class="hist-day-macros">Б${t.p}г · Ж${t.f}г · У${t.c}г</div>
+        <div class="hist-day-bar"><div class="hist-day-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      </div>
+      <div class="hist-day-right">
+        <div class="hist-day-kcal">${t.k}</div>
+        <div class="hist-day-target">из ${target} ккал</div>
+      </div>`;
+    card.onclick = () => openHistDetail(dateStr, dayState, t);
+    list.appendChild(card);
+  });
+}
+
+let _histDetailSheet = null;
+function openHistDetail(dateStr, dayState, totals) {
+  const [label, year] = formatDayLabel(dateStr);
+  document.getElementById('hd-date').textContent = label + (year?' '+year:'');
+
+  const target = TARGETS.kcal || 0;
+  const pPct = Math.min(Math.round(totals.p/(TARGETS.prot||1)*100),100);
+  const fPct = Math.min(Math.round(totals.f/(TARGETS.fat||1)*100),100);
+  const cPct = Math.min(Math.round(totals.c/(TARGETS.carb||1)*100),100);
+
+  document.getElementById('hd-summary').innerHTML = `
+    <div class="hd-sum-card" style="grid-column:1/-1">
+      <div class="hd-sum-label">Калории</div>
+      <div class="hd-sum-val">${totals.k} <span style="font-size:16px;font-weight:500;color:var(--muted2)">из ${target}</span></div>
+      <div class="hd-sum-sub">${target ? Math.round(totals.k/target*100)+'% от цели' : '—'}</div>
+    </div>
+    <div class="hd-sum-card">
+      <div class="hd-sum-label">Белок</div>
+      <div class="hd-sum-val" style="color:var(--p)">${totals.p}г</div>
+      <div class="hd-sum-sub">${pPct}% от цели</div>
+    </div>
+    <div class="hd-sum-card">
+      <div class="hd-sum-label">Жиры</div>
+      <div class="hd-sum-val" style="color:var(--f)">${totals.f}г</div>
+      <div class="hd-sum-sub">${fPct}% от цели</div>
+    </div>
+    <div class="hd-sum-card">
+      <div class="hd-sum-label">Углеводы</div>
+      <div class="hd-sum-val" style="color:var(--c)">${totals.c}г</div>
+      <div class="hd-sum-sub">${cPct}% от цели</div>
+    </div>
+    <div class="hd-sum-card">
+      <div class="hd-sum-label">Вода</div>
+      <div class="hd-sum-val" style="color:#4A8FDA">${dayState.water||0}</div>
+      <div class="hd-sum-sub">мл</div>
+    </div>`;
+
+  const mealsEl = document.getElementById('hd-meals');
+  mealsEl.innerHTML = '';
+  (dayState.meals||[]).forEach(meal => {
+    if (!meal.items || meal.items.length === 0) return;
+    const mKcal = Math.round(meal.items.reduce((s,i)=>s+i.kcal*i.grams/100,0));
+    const block = document.createElement('div');
+    block.className = 'hd-meal-block';
+    block.innerHTML = `<div class="hd-meal-name">${meal.name} · ${mKcal} ккал</div>` +
+      meal.items.map(it => {
+        const iK = Math.round(it.kcal*it.grams/100);
+        const unit = it.ml?'мл':'г';
+        return `<div class="hd-food-row">
+          <div class="hd-food-name">${it.name}</div>
+          <div class="hd-food-right">${it.grams}${unit}<br><span style="color:var(--muted)">${iK} ккал</span></div>
+        </div>`;
+      }).join('');
+    mealsEl.appendChild(block);
+  });
+
+  // Wrap body content in scrollable div
+  const sheet = document.getElementById('hist-detail-sheet');
+  // Move summary + meals into body wrapper if not already
+  let body = sheet.querySelector('.hist-detail-body');
+  if (!body) {
+    body = document.createElement('div');
+    body.className = 'hist-detail-body';
+    sheet.appendChild(body);
+  }
+  body.appendChild(document.getElementById('hd-summary'));
+  body.appendChild(mealsEl);
+
+  const overlay = document.getElementById('hist-detail-overlay');
+  overlay.style.display = 'flex';
+  setTimeout(() => sheet.classList.add('visible'), 10);
+}
+
+function closeHistDetailBtn() {
+  const sheet = document.getElementById('hist-detail-sheet');
+  sheet.classList.remove('visible');
+  setTimeout(() => { document.getElementById('hist-detail-overlay').style.display='none'; }, 320);
+}
+function closeHistDetail(e) {
+  if (e.target === document.getElementById('hist-detail-overlay')) closeHistDetailBtn();
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────
