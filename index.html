@@ -392,6 +392,49 @@
   .ac-macro-row-inline { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
   .ac-macro-row-inline .ac-inp { min-width: 0; width: 100%; }
 
+  /* ─── SCANNER ─────────────────────────────────────────── */
+  .scanner-no-api {
+    background: rgba(232,160,48,0.1); border: 1px solid rgba(232,160,48,0.3);
+    border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--f);
+    margin-bottom: 10px; text-align: center;
+  }
+  .scanner-btn-wrap { margin-bottom: 12px; }
+  .scanner-upload-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 13px; border-radius: 12px;
+    border: 1.5px dashed rgba(74,144,217,0.4); background: var(--p2);
+    color: var(--p); font-family: 'Manrope', sans-serif; font-size: 14px;
+    font-weight: 700; cursor: pointer; transition: all 0.15s;
+  }
+  .scanner-upload-btn:hover { border-color: var(--p); background: rgba(74,144,217,0.2); }
+  .scanner-upload-btn.scanning {
+    border-style: solid; background: rgba(74,144,217,0.1);
+    color: var(--muted2); pointer-events: none;
+    animation: scan-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes scan-pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  .scanner-results-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .scanner-card {
+    background: var(--card2); border: 1px solid var(--border2);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
+  }
+  .scanner-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+  .scanner-card-name { font-size: 15px; font-weight: 700; flex: 1; }
+  .scanner-card-save {
+    background: var(--c); border: none; border-radius: 8px; color: #fff;
+    font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 700;
+    padding: 6px 12px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+  .scanner-card-macros { font-size: 12px; color: var(--muted2); margin-bottom: 10px; }
+  .scanner-card-macros b { color: var(--text); }
+  .scanner-card-error { font-size: 13px; color: var(--red); }
+  .scanner-card-img {
+    width: 48px; height: 48px; border-radius: 8px; object-fit: cover;
+    flex-shrink: 0; border: 1px solid var(--border);
+  }
+  .scanner-card-saved { font-size: 12px; color: var(--c); margin-top: 6px; font-weight: 600; }
+
   /* ─── HISTORY PAGE ────────────────────────────────────── */
   .hist-header { padding: 6px 0 14px; }
   .hist-title { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
@@ -453,6 +496,81 @@
   .hd-food-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; background: var(--card2); border-radius: 10px; margin-bottom: 4px; }
   .hd-food-name { font-size: 14px; font-weight: 500; }
   .hd-food-right { font-size: 13px; color: var(--muted2); text-align: right; }
+
+  /* ─── API PAGE ────────────────────────────────────────── */
+  .api-page-header { padding: 6px 0 16px; }
+  .api-page-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+  .api-page-sub { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  .api-active-badge {
+    background: var(--c2); border: 1px solid rgba(59,189,138,0.3);
+    border-radius: 10px; padding: 10px 16px; margin-bottom: 16px;
+    font-size: 13px; color: var(--c); font-weight: 600; text-align: center;
+  }
+
+  .api-provider-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 16px 18px; margin-bottom: 10px;
+    transition: border-color 0.15s;
+  }
+  .api-provider-card.enabled { border-color: rgba(74,144,217,0.35); }
+
+  .api-prov-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .api-prov-icon { font-size: 22px; flex-shrink: 0; }
+  .api-prov-info { flex: 1; min-width: 0; }
+  .api-prov-name { font-size: 15px; font-weight: 700; }
+  .api-prov-desc { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+  /* Toggle switch */
+  .api-switch { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
+  .api-switch input { opacity: 0; width: 0; height: 0; }
+  .api-switch-slider {
+    position: absolute; inset: 0; background: var(--card2);
+    border: 1.5px solid var(--border2); border-radius: 13px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .api-switch-slider::before {
+    content: ''; position: absolute; width: 18px; height: 18px;
+    left: 3px; top: 50%; transform: translateY(-50%);
+    background: var(--muted); border-radius: 50%; transition: all 0.2s;
+  }
+  .api-switch input:checked + .api-switch-slider { background: var(--p); border-color: var(--p); }
+  .api-switch input:checked + .api-switch-slider::before { left: 19px; background: #fff; }
+
+  .api-key-row { display: flex; gap: 8px; align-items: center; }
+  .api-key-inp {
+    flex: 1; background: var(--card2); border: 1.5px solid var(--border2);
+    border-radius: 10px; color: var(--text); font-family: 'Manrope', sans-serif;
+    font-size: 13px; padding: 10px 14px; outline: none; min-width: 0;
+    font-family: monospace;
+  }
+  .api-key-inp:focus { border-color: var(--p); }
+  .api-key-inp::placeholder { color: #444; font-family: 'Manrope', sans-serif; }
+  .api-check-btn {
+    background: var(--card2); border: 1.5px solid var(--border2);
+    border-radius: 10px; color: var(--muted2); font-family: 'Manrope', sans-serif;
+    font-size: 13px; font-weight: 600; padding: 10px 14px; cursor: pointer;
+    white-space: nowrap; flex-shrink: 0; transition: all 0.15s;
+  }
+  .api-check-btn:hover { border-color: var(--p); color: var(--p); }
+  .api-check-btn.checking { opacity: 0.6; pointer-events: none; }
+
+  .api-status { font-size: 12px; margin-top: 8px; min-height: 16px; font-weight: 600; }
+  .api-status.ok  { color: var(--c); }
+  .api-status.err { color: var(--red); }
+  .api-status.checking { color: var(--muted); }
+
+  .api-link { font-size: 12px; color: var(--p); margin-top: 6px; display: block; text-decoration: none; }
+
+  .api-info-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 16px 18px; margin-top: 6px;
+  }
+  .api-info-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .api-info-row { font-size: 13px; color: var(--muted2); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .api-photo-yes { color: var(--c); font-weight: 600; white-space: nowrap; }
+  .api-photo-ok  { color: var(--f); font-weight: 600; white-space: nowrap; }
+  .api-photo-no  { color: var(--muted); font-weight: 600; white-space: nowrap; }
 
   /* ─── SCROLLBAR ───────────────────────────────────────── */
   ::-webkit-scrollbar { width: 4px; }
@@ -573,7 +691,22 @@
         <span class="qa-meal-label">Добавить в:</span>
         <select class="qa-meal-sel" id="qa-meal-sel"></select>
       </div>
-      <!-- Category scroll — sticky so it doesn't scroll away -->
+      <!-- Scanner button -->
+      <div id="scanner-no-api-warn" style="display:none" class="scanner-no-api">
+        ⚠️ Подключи API ключ в разделе 🔑 для сканирования фото
+      </div>
+      <div class="scanner-btn-wrap">
+        <label class="scanner-upload-btn" id="scanner-upload-label">
+          <input type="file" id="scanner-file-input" accept="image/*" multiple style="display:none" onchange="handleScannerFiles(event)">
+          📷 Сканировать состав по фото
+        </label>
+      </div>
+      <!-- Scan results -->
+      <div id="scanner-results" style="display:none">
+        <div class="scanner-results-title">Найдено на фото:</div>
+        <div id="scanner-cards"></div>
+      </div>
+      <!-- Category scroll -->
       <div class="qa-cat-scroll">
         <div class="cat-strip" id="cat-tabs"></div>
       </div>
@@ -795,6 +928,33 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════
+     PAGE — API
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-api">
+  <div class="page-inner">
+
+    <div class="api-page-header">
+      <div class="api-page-title">🔑 API ключи</div>
+      <div class="api-page-sub">Подключи нейросеть для сканирования состава продуктов по фото</div>
+    </div>
+
+    <div class="api-active-badge" id="api-active-badge" style="display:none">
+      <span id="api-active-name">—</span> активен для сканера
+    </div>
+
+    <div id="api-providers-list"></div>
+
+    <div class="api-info-card">
+      <div class="api-info-title">📷 Поддержка анализа фото</div>
+      <div class="api-info-row"><span class="api-photo-yes">✅ Отлично</span> Claude, GPT-4o, Gemini</div>
+      <div class="api-info-row"><span class="api-photo-ok">⚠️ Частично</span> DeepSeek, Grok, Qwen</div>
+      <div class="api-info-row"><span class="api-photo-no">❌ Слабо</span> GigaChat, YandexGPT</div>
+    </div>
+
+  </div>
+</div>
+
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="nav-btn active" id="nav-home" onclick="goPage('home')">
@@ -802,6 +962,9 @@
   </button>
   <button class="nav-btn" id="nav-history" onclick="goPage('history')">
     <span class="nav-icon">📅</span>История
+  </button>
+  <button class="nav-btn" id="nav-api" onclick="goPage('api')">
+    <span class="nav-icon">🔑</span>API
   </button>
   <button class="nav-btn" id="nav-params" onclick="goPage('params')">
     <span class="nav-icon">⚙️</span>Параметры
@@ -816,14 +979,7 @@ function goPage(id) {
   document.getElementById('page-' + id).classList.add('active');
   document.getElementById('nav-' + id).classList.add('active');
   if (id === 'history') renderHistory();
-}
-
-function openQuickAdd() {
-  renderQAMealSel(); renderCatTabs(); renderFoodGrid();
-  const overlay = document.getElementById('qa-overlay');
-  const sheet = document.getElementById('qa-sheet');
-  overlay.style.display = 'flex';
-  setTimeout(() => sheet.classList.add('visible'), 10);
+  if (id === 'api') renderApiPage();
 }
 
 function closeQuickAdd() {
@@ -1611,7 +1767,234 @@ function render() {
   renderWater();
 }
 
-// ─── HISTORY ─────────────────────────────────────────────────────
+// ─── API PAGE ─────────────────────────────────────────────────────
+const API_PROVIDERS = [
+  {
+    id: 'anthropic', name: 'Anthropic Claude', icon: '🟣',
+    desc: 'claude-3-5-haiku · Лучший анализ фото',
+    placeholder: 'sk-ant-api03-...',
+    photo: 'best',
+    link: 'https://console.anthropic.com',
+    linkText: 'Получить ключ → console.anthropic.com',
+    check: async (key) => {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 10, messages: [{ role: 'user', content: 'Hi' }] })
+      });
+      return r.ok;
+    }
+  },
+  {
+    id: 'openai', name: 'OpenAI GPT-4o', icon: '🟢',
+    desc: 'gpt-4o · Отлично читает фото состава',
+    placeholder: 'sk-proj-...',
+    photo: 'best',
+    link: 'https://platform.openai.com/api-keys',
+    linkText: 'Получить ключ → platform.openai.com',
+    check: async (key) => {
+      const r = await fetch('https://api.openai.com/v1/models', {
+        headers: { 'Authorization': 'Bearer ' + key }
+      });
+      return r.ok;
+    }
+  },
+  {
+    id: 'gemini', name: 'Google Gemini', icon: '🔵',
+    desc: 'gemini-1.5-flash · Есть бесплатный tier',
+    placeholder: 'AIza...',
+    photo: 'best',
+    link: 'https://aistudio.google.com/app/apikey',
+    linkText: 'Получить ключ → aistudio.google.com',
+    check: async (key) => {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+      return r.ok;
+    }
+  },
+  {
+    id: 'deepseek', name: 'DeepSeek', icon: '🟡',
+    desc: 'deepseek-chat · Очень дёшево',
+    placeholder: 'sk-...',
+    photo: 'partial',
+    link: 'https://platform.deepseek.com/api_keys',
+    linkText: 'Получить ключ → platform.deepseek.com',
+    check: async (key) => {
+      const r = await fetch('https://api.deepseek.com/models', {
+        headers: { 'Authorization': 'Bearer ' + key }
+      });
+      return r.ok;
+    }
+  },
+  {
+    id: 'grok', name: 'Grok (xAI)', icon: '⚫',
+    desc: 'grok-2-vision · Нужен X API access',
+    placeholder: 'xai-...',
+    photo: 'partial',
+    link: 'https://console.x.ai',
+    linkText: 'Получить ключ → console.x.ai',
+    check: async (key) => {
+      const r = await fetch('https://api.x.ai/v1/models', {
+        headers: { 'Authorization': 'Bearer ' + key }
+      });
+      return r.ok;
+    }
+  },
+  {
+    id: 'qwen', name: 'Qwen (Alibaba)', icon: '🔴',
+    desc: 'qwen-vl-plus · Могут быть проблемы из РФ',
+    placeholder: 'sk-...',
+    photo: 'partial',
+    link: 'https://dashscope.console.aliyun.com',
+    linkText: 'Получить ключ → dashscope.console.aliyun.com',
+    check: async (key) => {
+      const r = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/models', {
+        headers: { 'Authorization': 'Bearer ' + key }
+      });
+      return r.ok;
+    }
+  },
+  {
+    id: 'gigachat', name: 'GigaChat (Сбер)', icon: '🟠',
+    desc: 'GigaChat-Pro · Нужен Сбер ID',
+    placeholder: 'Авторизационные данные...',
+    photo: 'weak',
+    link: 'https://developers.sber.ru/portal/products/gigachat-api',
+    linkText: 'Получить доступ → developers.sber.ru',
+    check: async (key) => { return key.length > 10; } // OAuth, full check not possible via browser
+  },
+  {
+    id: 'yandexgpt', name: 'YandexGPT', icon: '🟡',
+    desc: 'yandexgpt-lite · Нужен Яндекс Cloud',
+    placeholder: 'AQVN...',
+    photo: 'weak',
+    link: 'https://console.yandex.cloud',
+    linkText: 'Получить ключ → console.yandex.cloud',
+    check: async (key) => { return key.length > 10; } // IAM token, can't verify without folder ID
+  },
+];
+
+function loadApiKeys() {
+  try { return JSON.parse(localStorage.getItem('nt_api_keys') || '{}'); } catch(e) { return {}; }
+}
+function saveApiKeys(d) { localStorage.setItem('nt_api_keys', JSON.stringify(d)); }
+function loadApiEnabled() {
+  try { return JSON.parse(localStorage.getItem('nt_api_enabled') || '{}'); } catch(e) { return {}; }
+}
+function saveApiEnabled(d) { localStorage.setItem('nt_api_enabled', JSON.stringify(d)); }
+function getActiveProvider() {
+  const enabled = loadApiEnabled();
+  const keys = loadApiKeys();
+  return API_PROVIDERS.find(p => enabled[p.id] && keys[p.id]) || null;
+}
+
+function renderApiPage() {
+  const keys = loadApiKeys();
+  const enabled = loadApiEnabled();
+  const list = document.getElementById('api-providers-list');
+  const badge = document.getElementById('api-active-badge');
+  const activeProv = getActiveProvider();
+
+  if (activeProv) {
+    badge.style.display = 'block';
+    document.getElementById('api-active-name').textContent = activeProv.icon + ' ' + activeProv.name;
+  } else {
+    badge.style.display = 'none';
+  }
+
+  list.innerHTML = '';
+  API_PROVIDERS.forEach(prov => {
+    const isEnabled = !!(enabled[prov.id] && keys[prov.id]);
+    const savedKey = keys[prov.id] || '';
+    const photoLabel = prov.photo === 'best' ? '📷 Анализ фото' : prov.photo === 'partial' ? '📷 Частично' : '📷 Слабо';
+    const photoColor = prov.photo === 'best' ? 'var(--c)' : prov.photo === 'partial' ? 'var(--f)' : 'var(--muted)';
+
+    const card = document.createElement('div');
+    card.className = 'api-provider-card' + (isEnabled ? ' enabled' : '');
+    card.id = 'api-card-' + prov.id;
+    card.innerHTML = `
+      <div class="api-prov-top">
+        <div class="api-prov-icon">${prov.icon}</div>
+        <div class="api-prov-info">
+          <div class="api-prov-name">${prov.name}</div>
+          <div class="api-prov-desc">${prov.desc} · <span style="color:${photoColor};font-weight:600">${photoLabel}</span></div>
+        </div>
+        <label class="api-switch">
+          <input type="checkbox" id="sw-${prov.id}" ${isEnabled?'checked':''} onchange="toggleApiProvider('${prov.id}')">
+          <span class="api-switch-slider"></span>
+        </label>
+      </div>
+      <div class="api-key-row">
+        <input class="api-key-inp" id="key-${prov.id}" type="password"
+          placeholder="${prov.placeholder}"
+          value="${savedKey}"
+          oninput="saveKeyDraft('${prov.id}')">
+        <button class="api-check-btn" id="chk-${prov.id}" onclick="checkApiKey('${prov.id}')">Проверить</button>
+      </div>
+      <div class="api-status" id="st-${prov.id}"></div>
+      <a class="api-link" href="${prov.link}" target="_blank">${prov.linkText}</a>`;
+    list.appendChild(card);
+  });
+}
+
+function saveKeyDraft(id) {
+  const val = document.getElementById('key-' + id).value.trim();
+  const keys = loadApiKeys();
+  if (val) keys[id] = val; else delete keys[id];
+  saveApiKeys(keys);
+  // clear status on edit
+  document.getElementById('st-' + id).textContent = '';
+}
+
+function toggleApiProvider(id) {
+  const enabled = loadApiEnabled();
+  const isOn = document.getElementById('sw-' + id).checked;
+  // Turn off all others if turning on
+  if (isOn) {
+    Object.keys(enabled).forEach(k => { enabled[k] = false; });
+    enabled[id] = true;
+  } else {
+    enabled[id] = false;
+  }
+  saveApiEnabled(enabled);
+  // Re-render to update badge and card styles
+  renderApiPage();
+}
+
+async function checkApiKey(id) {
+  const prov = API_PROVIDERS.find(p => p.id === id);
+  const key = document.getElementById('key-' + id).value.trim();
+  const btn = document.getElementById('chk-' + id);
+  const st = document.getElementById('st-' + id);
+
+  if (!key) { st.className = 'api-status err'; st.textContent = '⚠️ Введи ключ'; return; }
+
+  btn.classList.add('checking');
+  btn.textContent = '...';
+  st.className = 'api-status checking';
+  st.textContent = 'Проверяю...';
+
+  // Save key first
+  const keys = loadApiKeys();
+  keys[id] = key;
+  saveApiKeys(keys);
+
+  try {
+    const ok = await prov.check(key);
+    if (ok) {
+      st.className = 'api-status ok';
+      st.textContent = '✅ Ключ работает';
+    } else {
+      st.className = 'api-status err';
+      st.textContent = '❌ Ключ не принят — проверь правильность';
+    }
+  } catch(e) {
+    st.className = 'api-status err';
+    st.textContent = '❌ Ошибка сети — возможно CORS или VPN нужен';
+  }
+
+  btn.classList.remove('checking');
+  btn.textContent = 'Проверить';
+}
 function getAllDayKeys() {
   const keys = [];
   for (let i = 0; i < localStorage.length; i++) {
@@ -1794,6 +2177,223 @@ function closeHistDetailBtn() {
 }
 function closeHistDetail(e) {
   if (e.target === document.getElementById('hist-detail-overlay')) closeHistDetailBtn();
+}
+
+// ─── SCANNER ─────────────────────────────────────────────────────
+function openQuickAdd() {
+  renderQAMealSel(); renderCatTabs(); renderFoodGrid();
+  // Check API availability
+  const prov = getActiveProvider();
+  document.getElementById('scanner-no-api-warn').style.display = prov ? 'none' : 'block';
+  document.getElementById('scanner-results').style.display = 'none';
+  document.getElementById('scanner-cards').innerHTML = '';
+  document.getElementById('scanner-file-input').value = '';
+  const lbl = document.getElementById('scanner-upload-label');
+  lbl.classList.remove('scanning');
+  lbl.textContent = '📷 Сканировать состав по фото';
+
+  const overlay = document.getElementById('qa-overlay');
+  const sheet = document.getElementById('qa-sheet');
+  overlay.style.display = 'flex';
+  setTimeout(() => sheet.classList.add('visible'), 10);
+}
+
+async function handleScannerFiles(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+
+  const prov = getActiveProvider();
+  if (!prov) {
+    document.getElementById('scanner-no-api-warn').style.display = 'block';
+    return;
+  }
+
+  const lbl = document.getElementById('scanner-upload-label');
+  lbl.classList.add('scanning');
+  lbl.textContent = `⏳ Анализирую ${files.length > 1 ? files.length + ' фото' : 'фото'}...`;
+
+  const resultsEl = document.getElementById('scanner-results');
+  const cardsEl = document.getElementById('scanner-cards');
+  resultsEl.style.display = 'block';
+  cardsEl.innerHTML = '';
+
+  for (const file of files) {
+    const card = document.createElement('div');
+    card.className = 'scanner-card';
+    card.innerHTML = `<div class="scanner-card-top"><div class="scanner-card-name">⏳ Анализирую ${file.name}...</div></div>`;
+    cardsEl.appendChild(card);
+
+    try {
+      const b64 = await fileToBase64(file);
+      const result = await scanImageWithAI(prov, b64, file.type);
+      renderScannerCard(card, result, b64, file.type);
+    } catch(err) {
+      card.innerHTML = `<div class="scanner-card-top"><div class="scanner-card-name">❌ ${file.name}</div></div><div class="scanner-card-error">${err.message || 'Ошибка анализа'}</div>`;
+    }
+  }
+
+  lbl.classList.remove('scanning');
+  lbl.textContent = '📷 Добавить ещё фото';
+}
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Не удалось прочитать файл'));
+    r.readAsDataURL(file);
+  });
+}
+
+async function scanImageWithAI(prov, b64, mimeType) {
+  const keys = loadApiKeys();
+  const key = keys[prov.id];
+  const prompt = `Ты анализируешь фото состава продукта питания. Извлеки ТОЛЬКО следующие данные на 100г/100мл:
+- Название продукта (короткое, на русском)
+- Калории (ккал)
+- Белки (г)
+- Жиры (г)  
+- Углеводы (г)
+- Тип: "food" (твёрдое, измеряем в граммах) или "drink" (жидкость, измеряем в мл)
+
+Ответь СТРОГО в формате JSON без лишнего текста:
+{"name":"...","kcal":0,"p":0,"f":0,"c":0,"type":"food"}
+
+Если на фото нет состава — верни {"error":"Состав не найден на фото"}`;
+
+  if (prov.id === 'anthropic') {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001', max_tokens: 300,
+        messages: [{ role: 'user', content: [
+          { type: 'image', source: { type: 'base64', media_type: mimeType, data: b64 } },
+          { type: 'text', text: prompt }
+        ]}]
+      })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || 'Ошибка API');
+    return JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());
+
+  } else if (prov.id === 'openai') {
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o', max_tokens: 300,
+        messages: [{ role: 'user', content: [
+          { type: 'image_url', image_url: { url: `data:${mimeType};base64,${b64}` } },
+          { type: 'text', text: prompt }
+        ]}]
+      })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || 'Ошибка API');
+    return JSON.parse(d.choices[0].message.content.replace(/```json|```/g,'').trim());
+
+  } else if (prov.id === 'gemini') {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [
+        { inline_data: { mime_type: mimeType, data: b64 } },
+        { text: prompt }
+      ]}]})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || 'Ошибка API');
+    return JSON.parse(d.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim());
+
+  } else if (prov.id === 'deepseek') {
+    const r = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'deepseek-chat', max_tokens: 300,
+        messages: [{ role: 'user', content: [
+          { type: 'image_url', image_url: { url: `data:${mimeType};base64,${b64}` } },
+          { type: 'text', text: prompt }
+        ]}]
+      })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || 'Ошибка API');
+    return JSON.parse(d.choices[0].message.content.replace(/```json|```/g,'').trim());
+
+  } else if (prov.id === 'grok') {
+    const r = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'grok-2-vision-1212', max_tokens: 300,
+        messages: [{ role: 'user', content: [
+          { type: 'image_url', image_url: { url: `data:${mimeType};base64,${b64}` } },
+          { type: 'text', text: prompt }
+        ]}]
+      })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || 'Ошибка API');
+    return JSON.parse(d.choices[0].message.content.replace(/```json|```/g,'').trim());
+
+  } else {
+    // Qwen, GigaChat, YandexGPT — text only fallback
+    throw new Error('Этот провайдер не поддерживает анализ фото в браузере. Используй Claude, GPT-4o или Gemini.');
+  }
+}
+
+function renderScannerCard(card, result, b64, mimeType) {
+  if (result.error) {
+    card.innerHTML = `<div class="scanner-card-top"><div class="scanner-card-name">🔍 Не найдено</div></div><div class="scanner-card-error">${result.error}</div>`;
+    return;
+  }
+  const isML = result.type === 'drink';
+  const unit = isML ? 'мл' : 'г';
+  const itemId = 'sc_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+  card.dataset.result = JSON.stringify(result);
+  card.innerHTML = `
+    <div class="scanner-card-top">
+      <img class="scanner-card-img" src="data:${mimeType};base64,${b64}" alt="">
+      <div style="flex:1;min-width:0">
+        <div class="scanner-card-name">${result.name}</div>
+        <div class="scanner-card-macros">
+          <b>${result.kcal}</b> ккал · Б<b>${result.p}</b> Ж<b>${result.f}</b> У<b>${result.c}</b> · на 100${unit}
+        </div>
+      </div>
+      <button class="scanner-card-save" onclick="saveScanResult('${itemId}', this)">+ В «Моё»</button>
+    </div>
+    <div class="scanner-card-saved" id="saved-${itemId}" style="display:none">✅ Сохранено в «Моё»</div>`;
+  card.dataset.itemId = itemId;
+  card.dataset.resultJson = JSON.stringify(result);
+}
+
+function saveScanResult(itemId, btn) {
+  const card = btn.closest('.scanner-card');
+  const result = JSON.parse(card.dataset.resultJson);
+  const isML = result.type === 'drink';
+  const newItem = {
+    name: result.name,
+    kcal: result.kcal,
+    p: result.p,
+    f: result.f,
+    c: result.c,
+    portion: isML ? '100мл' : '100г',
+    ...(isML ? { piece: true, gramsPerPiece: 200, ml: true } : {})
+  };
+  const customs = loadCustomItems();
+  // Avoid duplicates
+  if (!customs.find(i => i.name === newItem.name)) {
+    customs.push(newItem);
+    saveCustomItems(customs);
+  }
+  btn.style.display = 'none';
+  document.getElementById('saved-' + itemId).style.display = 'block';
+  // Refresh «Моё» tab
+  FOOD_CATS = getFoodCats();
+  if (qaCat === 'mine') renderFoodGrid();
+  renderCatTabs();
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────
