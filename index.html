@@ -1771,7 +1771,7 @@ function render() {
 const API_PROVIDERS = [
   {
     id: 'anthropic', name: 'Anthropic Claude', icon: '🟣',
-    desc: 'claude-3-5-haiku · Лучший анализ фото',
+    desc: 'claude-haiku-4-5 · Лучший анализ фото',
     placeholder: 'sk-ant-api03-...',
     photo: 'best',
     link: 'https://console.anthropic.com',
@@ -1801,7 +1801,7 @@ const API_PROVIDERS = [
   },
   {
     id: 'gemini', name: 'Google Gemini', icon: '🔵',
-    desc: 'gemini-2.0-flash · Есть бесплатный tier',
+    desc: 'gemini-2.5-flash · Бесплатно 10 req/мин, 250/день',
     placeholder: 'AIza...',
     photo: 'best',
     link: 'https://aistudio.google.com/app/apikey',
@@ -1813,7 +1813,7 @@ const API_PROVIDERS = [
   },
   {
     id: 'deepseek', name: 'DeepSeek', icon: '🟡',
-    desc: 'deepseek-chat · Очень дёшево',
+    desc: 'deepseek-chat (V3.2) · Очень дёшево, фото не поддерживает',
     placeholder: 'sk-...',
     photo: 'partial',
     link: 'https://platform.deepseek.com/api_keys',
@@ -1827,7 +1827,7 @@ const API_PROVIDERS = [
   },
   {
     id: 'grok', name: 'Grok (xAI)', icon: '⚫',
-    desc: 'grok-2-vision · Нужен X API access',
+    desc: 'grok-2-vision-1212 · Нужен X API access',
     placeholder: 'xai-...',
     photo: 'partial',
     link: 'https://console.x.ai',
@@ -1855,21 +1855,21 @@ const API_PROVIDERS = [
   },
   {
     id: 'gigachat', name: 'GigaChat (Сбер)', icon: '🟠',
-    desc: 'GigaChat-Pro · Нужен Сбер ID',
+    desc: 'GigaChat-Pro · Нужен Сбер ID, фото не поддерживает',
     placeholder: 'Авторизационные данные...',
     photo: 'weak',
     link: 'https://developers.sber.ru/portal/products/gigachat-api',
     linkText: 'Получить доступ → developers.sber.ru',
-    check: async (key) => { return key.length > 10; } // OAuth, full check not possible via browser
+    check: async (key) => { return key.length > 10; }
   },
   {
     id: 'yandexgpt', name: 'YandexGPT', icon: '🟡',
-    desc: 'yandexgpt-lite · Нужен Яндекс Cloud',
+    desc: 'yandexgpt-lite · Нужен Яндекс Cloud, фото не поддерживает',
     placeholder: 'AQVN...',
     photo: 'weak',
     link: 'https://console.yandex.cloud',
     linkText: 'Получить ключ → console.yandex.cloud',
-    check: async (key) => { return key.length > 10; } // IAM token, can't verify without folder ID
+    check: async (key) => { return key.length > 10; }
   },
 ];
 
@@ -2296,7 +2296,7 @@ async function scanImageWithAI(prov, b64, mimeType) {
     return JSON.parse(d.choices[0].message.content.replace(/```json|```/g,'').trim());
 
   } else if (prov.id === 'gemini') {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [
@@ -2307,22 +2307,6 @@ async function scanImageWithAI(prov, b64, mimeType) {
     const d = await r.json();
     if (!r.ok) throw new Error(d.error?.message || 'Ошибка API');
     return JSON.parse(d.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim());
-
-  } else if (prov.id === 'deepseek') {
-    const r = await fetch('https://api.deepseek.com/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'deepseek-chat', max_tokens: 300,
-        messages: [{ role: 'user', content: [
-          { type: 'image_url', image_url: { url: `data:${mimeType};base64,${b64}` } },
-          { type: 'text', text: prompt }
-        ]}]
-      })
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error?.message || 'Ошибка API');
-    return JSON.parse(d.choices[0].message.content.replace(/```json|```/g,'').trim());
 
   } else if (prov.id === 'grok') {
     const r = await fetch('https://api.x.ai/v1/chat/completions', {
@@ -2341,8 +2325,8 @@ async function scanImageWithAI(prov, b64, mimeType) {
     return JSON.parse(d.choices[0].message.content.replace(/```json|```/g,'').trim());
 
   } else {
-    // Qwen, GigaChat, YandexGPT — text only fallback
-    throw new Error('Этот провайдер не поддерживает анализ фото в браузере. Используй Claude, GPT-4o или Gemini.');
+    // DeepSeek, Qwen, GigaChat, YandexGPT — не поддерживают анализ фото через браузер
+    throw new Error('Этот провайдер не поддерживает анализ фото. Используй Claude, GPT-4o или Gemini.');
   }
 }
 
