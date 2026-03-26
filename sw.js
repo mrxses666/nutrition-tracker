@@ -1,15 +1,11 @@
-const CACHE = 'nutrition-v1';
-const ASSETS = [
-  '/index.html',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
-];
+const CACHE = 'nutrition-v2';
+const BASE = self.location.pathname.replace('sw.js', '');
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches.open(CACHE).then(cache => 
+      cache.addAll([BASE + 'index.html', BASE + 'manifest.json'])
+    ).then(() => self.skipWaiting())
   );
 });
 
@@ -30,7 +26,7 @@ self.addEventListener('fetch', e => {
         const clone = res.clone();
         caches.open(CACHE).then(cache => cache.put(e.request, clone));
         return res;
-      }).catch(() => caches.match('/index.html'));
+      }).catch(() => caches.match(BASE + 'index.html'));
     })
   );
 });
