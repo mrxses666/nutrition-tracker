@@ -696,10 +696,10 @@
         ⚠️ Подключи API ключ в разделе 🔑 для сканирования фото
       </div>
       <div class="scanner-btn-wrap">
-        <label class="scanner-upload-btn" id="scanner-upload-label">
-          <input type="file" id="scanner-file-input" accept="image/*" multiple style="display:none" onchange="handleScannerFiles(event)">
-          📷 Сканировать состав по фото
-        </label>
+        <input type="file" id="scanner-file-input" accept="image/*" multiple style="display:none" onchange="handleScannerFiles(event)">
+        <button class="scanner-upload-btn" id="scanner-upload-label" onclick="document.getElementById('scanner-file-input').click()">
+          <span id="scanner-upload-text">📷 Сканировать состав по фото</span>
+        </button>
       </div>
       <!-- Scan results -->
       <div id="scanner-results" style="display:none">
@@ -1801,7 +1801,7 @@ const API_PROVIDERS = [
   },
   {
     id: 'gemini', name: 'Google Gemini', icon: '🔵',
-    desc: 'gemini-1.5-flash · Есть бесплатный tier',
+    desc: 'gemini-2.0-flash · Есть бесплатный tier',
     placeholder: 'AIza...',
     photo: 'best',
     link: 'https://aistudio.google.com/app/apikey',
@@ -2189,8 +2189,9 @@ function openQuickAdd() {
   document.getElementById('scanner-cards').innerHTML = '';
   document.getElementById('scanner-file-input').value = '';
   const lbl = document.getElementById('scanner-upload-label');
+  const txt = document.getElementById('scanner-upload-text');
   lbl.classList.remove('scanning');
-  lbl.textContent = '📷 Сканировать состав по фото';
+  txt.textContent = '📷 Сканировать состав по фото';
 
   const overlay = document.getElementById('qa-overlay');
   const sheet = document.getElementById('qa-sheet');
@@ -2209,8 +2210,9 @@ async function handleScannerFiles(e) {
   }
 
   const lbl = document.getElementById('scanner-upload-label');
+  const txt = document.getElementById('scanner-upload-text');
   lbl.classList.add('scanning');
-  lbl.textContent = `⏳ Анализирую ${files.length > 1 ? files.length + ' фото' : 'фото'}...`;
+  txt.textContent = `⏳ Анализирую ${files.length > 1 ? files.length + ' фото' : 'фото'}...`;
 
   const resultsEl = document.getElementById('scanner-results');
   const cardsEl = document.getElementById('scanner-cards');
@@ -2233,7 +2235,7 @@ async function handleScannerFiles(e) {
   }
 
   lbl.classList.remove('scanning');
-  lbl.textContent = '📷 Добавить ещё фото';
+  txt.textContent = '📷 Добавить ещё фото';
 }
 
 function fileToBase64(file) {
@@ -2294,7 +2296,7 @@ async function scanImageWithAI(prov, b64, mimeType) {
     return JSON.parse(d.choices[0].message.content.replace(/```json|```/g,'').trim());
 
   } else if (prov.id === 'gemini') {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [
