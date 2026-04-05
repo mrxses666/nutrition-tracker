@@ -166,13 +166,18 @@
   .meal-block.open .meal-chev { transform: rotate(180deg); }
   .meal-items { border-top: 1px solid var(--border); background: #191919; border-radius: 0 0 var(--r) var(--r); }
   .meal-items.hidden { display: none; }
-  .food-item { display: grid; grid-template-columns: 1fr auto auto auto; align-items: center; gap: 10px; padding: 11px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .food-item { display: grid; grid-template-columns: auto 1fr auto auto auto; align-items: center; gap: 10px; padding: 11px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); }
   .food-item:last-child { border-bottom: none; }
   .food-name-txt { font-size: 14px; font-weight: 500; }
   .food-g { font-size: 13px; color: var(--muted); }
   .food-k { font-size: 13px; color: var(--muted2); font-variant-numeric: tabular-nums; }
   .food-del { background: none; border: none; color: #444; font-size: 18px; cursor: pointer; padding: 0 0 0 6px; line-height: 1; }
   .food-del:hover { color: var(--red); }
+  .food-check { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--border2); background: var(--card2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: all 0.15s; }
+  .food-check.checked { background: rgba(59,189,138,0.2); border-color: var(--c); }
+  .food-check.checked::after { content: '✓'; font-size: 12px; color: var(--c); font-weight: 800; line-height: 1; }
+  .food-item.unchecked { opacity: 0.45; }
+  .food-item.unchecked .food-name-txt { text-decoration: line-through; }
 
   /* Search add-row */
   .add-row { padding: 12px 16px 14px; background: #191919; position: relative; }
@@ -1577,7 +1582,8 @@ function confirmPPAdd() {
     name: ppFood.name, grams,
     kcal: ppFood.kcal, p: ppFood.p, f: ppFood.f, c: ppFood.c,
     ml: ppFood.ml || false,
-    pieces: piecesCount, portion: ppFood.portion || null
+    pieces: piecesCount, portion: ppFood.portion || null,
+    eaten: true
   });
   saveState(); render(); closePP();
   renderQAMealSel();
@@ -1603,6 +1609,7 @@ function saveState() { localStorage.setItem('nt_day_'+todayKey(), JSON.stringify
 function getTotals() {
   let k=0,p=0,f=0,c=0;
   state.meals.forEach(m=>m.items.forEach(it=>{
+    if (it.eaten === false) return; // skip unchecked items
     const r=it.grams/100;
     k+=it.kcal*r; p+=it.p*r; f+=it.f*r; c+=it.c*r;
   }));
@@ -1674,7 +1681,11 @@ function buildFoodItem(mealId, item) {
   } else {
     amountLabel = item.grams + unit;
   }
-  return `<div class="food-item">
+  const eaten = item.eaten !== false; // default true
+  const uncheckedClass = eaten ? '' : ' unchecked';
+  const checkClass = eaten ? ' checked' : '';
+  return `<div class="food-item${uncheckedClass}" id="fi-${mealId}-${item.id}">
+    <div class="food-check${checkClass}" onclick="toggleFoodEaten(${mealId},${item.id})"></div>
     <span class="food-name-txt">${item.name}</span>
     <span class="food-g">${amountLabel}</span>
     <span class="food-k">${iK} ккал</span>
@@ -1747,9 +1758,18 @@ function addFood(mealId) {
   if (!food && ne.value.trim()) food = {name:ne.value.trim(),kcal:0,p:0,f:0,c:0};
   if (!food) return;
   state.meals.find(m=>m.id===mealId).items.push(
-    {id:state.nextItemId++,name:food.name,grams,kcal:food.kcal,p:food.p,f:food.f,c:food.c}
+    {id:state.nextItemId++,name:food.name,grams,kcal:food.kcal,p:food.p,f:food.f,c:food.c,eaten:true}
   );
   ne.value=''; ge.value=''; selFood=null;
+  saveState(); render();
+}
+
+function toggleFoodEaten(mealId, itemId) {
+  const meal = state.meals.find(m=>m.id===mealId);
+  if (!meal) return;
+  const item = meal.items.find(i=>i.id===itemId);
+  if (!item) return;
+  item.eaten = item.eaten === false ? true : false;
   saveState(); render();
 }
 
@@ -2067,6 +2087,7 @@ function getAllDayKeys() {
 function getDayTotals(dayState) {
   let k=0,p=0,f=0,c=0;
   (dayState.meals||[]).forEach(m=>(m.items||[]).forEach(it=>{
+    if (it.eaten === false) return;
     const r=it.grams/100;
     k+=it.kcal*r; p+=it.p*r; f+=it.f*r; c+=it.c*r;
   }));
@@ -2310,16 +2331,17 @@ function fileToBase64(file) {
 async function scanImageWithAI(prov, b64, mimeType) {
   const keys = loadApiKeys();
   const key = keys[prov.id];
-  const prompt = `Ты анализируешь фото состава продукта питания. Извлеки ТОЛЬКО следующие данные на 100г/100мл:
+  const prompt = `Ты анализируешь фото состава продукта питания. Извлеки следующие данные:
 - Название продукта (короткое, на русском)
-- Калории (ккал)
-- Белки (г)
-- Жиры (г)  
-- Углеводы (г)
+- Калории (ккал) на 100г/100мл
+- Белки (г) на 100г/100мл
+- Жиры (г) на 100г/100мл
+- Углеводы (г) на 100г/100мл
 - Тип: "food" (твёрдое, измеряем в граммах) или "drink" (жидкость, измеряем в мл)
+- totalGrams: масса или объём всей упаковки/порции в граммах или мл (например, если написано "225г" или "500мл" — укажи это число). Если не указано — верни null.
 
 Ответь СТРОГО в формате JSON без лишнего текста:
-{"name":"...","kcal":0,"p":0,"f":0,"c":0,"type":"food"}
+{"name":"...","kcal":0,"p":0,"f":0,"c":0,"type":"food","totalGrams":null}
 
 Если на фото нет состава — верни {"error":"Состав не найден на фото"}`;
 
@@ -2398,6 +2420,8 @@ function renderScannerCard(card, result, b64, mimeType) {
   const isML = result.type === 'drink';
   const unit = isML ? 'мл' : 'г';
   const itemId = 'sc_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+  const totalGrams = result.totalGrams || null;
+  const portionNote = totalGrams ? ` · Упаковка: <b>${totalGrams}${unit}</b>` : '';
   card.dataset.result = JSON.stringify(result);
   card.innerHTML = `
     <div class="scanner-card-top">
@@ -2405,14 +2429,42 @@ function renderScannerCard(card, result, b64, mimeType) {
       <div style="flex:1;min-width:0">
         <div class="scanner-card-name">${result.name}</div>
         <div class="scanner-card-macros">
-          <b>${result.kcal}</b> ккал · Б<b>${result.p}</b> Ж<b>${result.f}</b> У<b>${result.c}</b> · на 100${unit}
+          <b>${result.kcal}</b> ккал · Б<b>${result.p}</b> Ж<b>${result.f}</b> У<b>${result.c}</b> · на 100${unit}${portionNote}
         </div>
       </div>
       <button class="scanner-card-save" onclick="saveScanResult('${itemId}', this)">+ В «Моё»</button>
     </div>
-    <div class="scanner-card-saved" id="saved-${itemId}" style="display:none">✅ Сохранено в «Моё»</div>`;
+    <div class="scanner-card-add-row" style="padding:8px 0 4px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:12px;color:var(--muted);flex-shrink:0">Добавить сейчас:</span>
+      <input class="fi" id="scan-grams-${itemId}" type="number" min="1" value="${totalGrams || 100}" style="width:80px;flex:none;font-size:14px;padding:7px 10px">
+      <span style="font-size:12px;color:var(--muted)">${unit}</span>
+      <button onclick="addScanToMeal('${itemId}')" style="flex:1;padding:8px 10px;background:var(--p);border:none;border-radius:9px;color:#fff;font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;cursor:pointer">+ В приём</button>
+    </div>
+    <div class="scanner-card-saved" id="saved-${itemId}" style="display:none">✅ Добавлено в приём пищи</div>`;
   card.dataset.itemId = itemId;
   card.dataset.resultJson = JSON.stringify(result);
+}
+
+function addScanToMeal(itemId) {
+  const card = document.querySelector(`[data-item-id="${itemId}"]`);
+  if (!card) return;
+  const result = JSON.parse(card.dataset.resultJson);
+  const gramsInp = document.getElementById('scan-grams-' + itemId);
+  const grams = parseInt(gramsInp?.value) || 100;
+  const isML = result.type === 'drink';
+  const mealId = parseInt(document.getElementById('qa-meal-sel').value);
+  const meal = state.meals.find(m => m.id === mealId);
+  if (!meal) return;
+  meal.items.push({
+    id: state.nextItemId++,
+    name: result.name, grams,
+    kcal: result.kcal, p: result.p, f: result.f, c: result.c,
+    ml: isML, eaten: true
+  });
+  saveState(); render();
+  document.getElementById('saved-' + itemId).style.display = 'block';
+  const addRow = card.querySelector('.scanner-card-add-row');
+  if (addRow) addRow.style.display = 'none';
 }
 
 function saveScanResult(itemId, btn) {
